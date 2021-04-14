@@ -41,6 +41,9 @@ jobs:
           docker tag $IMAGE_NAME $IMAGE_ID:${{steps.version.outputs.full}}
           docker push $IMAGE_ID:${{steps.version.outputs.full}}
 
+          docker tag $IMAGE_NAME $IMAGE_ID:latest
+          docker push $IMAGE_ID:latest
+
 
       - name: Create Release
         id: create_release
