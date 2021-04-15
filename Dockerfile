@@ -1,11 +1,11 @@
 FROM mcr.microsoft.com/vscode/devcontainers/dotnetcore:5.0
 ARG NODE_VERSION="lts/*"
-ARG USERNAME=vscode
+
 
 # Configure apt
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN su $USERNAME -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"
+RUN su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"
 
 # Verify git and needed tools are installed
 RUN apt-get install -y git procps
@@ -32,7 +32,7 @@ RUN touch /var/run/docker-host.sock \
 RUN echo "#!/bin/sh\n\
   sudoIf() { if [ \"\$(id -u)\" -ne 0 ]; then sudo \"\$@\"; else \"\$@\"; fi }\n\
   sudoIf rm -rf /var/run/docker.sock\n\
-  ((sudoIf socat UNIX-LISTEN:/var/run/docker.sock,fork,mode=660,user=$USERNAME UNIX-CONNECT:/var/run/docker-host.sock) 2>&1 >> /tmp/vscr-docker-from-docker.log) & > /dev/null\n\
+  ((sudoIf socat UNIX-LISTEN:/var/run/docker.sock,fork,mode=660,user=vscode UNIX-CONNECT:/var/run/docker-host.sock) 2>&1 >> /tmp/vscr-docker-from-docker.log) & > /dev/null\n\
   \"\$@\"" >> /usr/local/share/docker-init.sh \
   && chmod +x /usr/local/share/docker-init.sh
 
@@ -46,7 +46,7 @@ RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod
   && apt-get install -y dotnet-sdk-3.1
 
 # Install node tooling 
-RUN su $USERNAME -c "source /usr/local/share/nvm/nvm.sh && npm install -g yarn typescript ts-node @angular/cli" 2>&1
+RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g yarn typescript ts-node @angular/cli" 2>&1
 
 
 # Bash history
@@ -54,16 +54,16 @@ RUN su $USERNAME -c "source /usr/local/share/nvm/nvm.sh && npm install -g yarn t
 RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
     && mkdir /commandhistory \
     && touch /commandhistory/.bash_history \
-    && chown -R $USERNAME /commandhistory \
-    && echo $SNIPPET >> "/home/$USERNAME/.bashrc"
+    && chown -R vscode /commandhistory \
+    && echo $SNIPPET >> "/home/vscode/.bashrc"
 
 # Extension cache 
 
-RUN mkdir -p /home/$USERNAME/.vscode-server/extensions \
-    /home/$USERNAME/.vscode-server-insiders/extensions \
-  && chown -R $USERNAME \
-    /home/$USERNAME/.vscode-server \
-    /home/$USERNAME/.vscode-server-insiders
+RUN mkdir -p /home/vscode/.vscode-server/extensions \
+    /home/vscode/.vscode-server-insiders/extensions \
+  && chown -R vscode \
+    /home/vscode/.vscode-server \
+    /home/vscode/.vscode-server-insiders
 
 # Cleanup
 RUN apt-get autoremove -y \
