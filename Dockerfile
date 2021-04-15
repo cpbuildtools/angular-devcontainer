@@ -47,6 +47,15 @@ RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod
 # Install node tooling 
 RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g yarn typescript ts-node @angular/cli" 2>&1
 
+
+# Bash history
+RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
+    && mkdir /commandhistory \
+    && touch /commandhistory/.bash_history \
+    && chown -R vscode /commandhistory \
+    && echo $SNIPPET >> "/home/vscode/.bashrc"
+
+
 # Cleanup
 RUN apt-get autoremove -y \
 && apt-get clean -y \
