@@ -43,6 +43,7 @@ RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod
   && apt-get update \
   && apt-get install -y dotnet-sdk-3.1
 
+
 # Install node tooling 
 RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g yarn typescript ts-node @angular/cli" 2>&1
 
@@ -64,6 +65,10 @@ RUN mkdir -p /home/vscode/.vscode-server/extensions \
 # devcontainer folder
 RUN mkdir -p /home/vscode/devcontainer \
   && chown -R vscode /home/vscode/devcontainer
+
+# nuget folder
+RUN mkdir -p /home/vscode/.nuget/ \
+  && chown -R vscode /home/vscode/.nuget/
 
 # Cleanup
 RUN apt-get autoremove -y \
