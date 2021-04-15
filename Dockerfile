@@ -67,7 +67,7 @@ RUN mkdir -p /home/vscode/devcontainer \
   && chown -R vscode /home/vscode/devcontainer
 
 # nuget folder
-RUN mkdir -p /home/vscode/.nuget/ \
+RUN mkdir -p /home/vscode/.nuget/packages/ \
   && chown -R vscode /home/vscode/.nuget/
 
 # Cleanup
