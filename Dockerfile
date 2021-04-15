@@ -1,7 +1,5 @@
 FROM mcr.microsoft.com/vscode/devcontainers/dotnetcore:5.0
 ARG NODE_VERSION="lts/*"
-
-
 # Configure apt
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -48,22 +46,24 @@ RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod
 # Install node tooling 
 RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g yarn typescript ts-node @angular/cli" 2>&1
 
-
 # Bash history
-
 RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
     && mkdir /commandhistory \
     && touch /commandhistory/.bash_history \
     && chown -R vscode /commandhistory \
     && echo $SNIPPET >> "/home/vscode/.bashrc"
 
-# Extension cache 
 
+# Extension cache 
 RUN mkdir -p /home/vscode/.vscode-server/extensions \
     /home/vscode/.vscode-server-insiders/extensions \
   && chown -R vscode \
     /home/vscode/.vscode-server \
     /home/vscode/.vscode-server-insiders
+
+# devcontainer folder
+RUN mkdir -p /home/vscode/devcontainer \
+  && chown -R vscode /home/vscode/devcontainer
 
 # Cleanup
 RUN apt-get autoremove -y \
