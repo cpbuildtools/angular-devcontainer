@@ -34,6 +34,7 @@ RUN echo "#!/bin/sh\n\
   \"\$@\"" >> /usr/local/share/docker-init.sh \
   && chmod +x /usr/local/share/docker-init.sh
 
+
 # Install dotnet code formatter
 RUN dotnet tool install -g dotnet-format
 
@@ -54,6 +55,13 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
     && chown -R vscode /commandhistory \
     && echo $SNIPPET >> "/home/vscode/.bashrc"
 
+
+# Install Java
+RUN apt-get update \
+  && apt-get install -y default-jdk 
+
+# Install OpenApi generator
+RUN npm i -g @openapitools/openapi-generator-cli
 
 # Extension cache 
 RUN mkdir -p /home/vscode/.vscode-server/extensions \
