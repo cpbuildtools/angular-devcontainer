@@ -78,30 +78,22 @@ jobs:
           docker push $IMAGE_ID:${{steps.version.outputs.full}}
           docker push $IMAGE_ID:${{steps.version.outputs.major}}
 
-#
-#    - name: Push image
-#      run: |
-#        IMAGE_ID=docker.pkg.github.com/$IMAGE_OWNER/$IMAGE_REPO/$IMAGE_NAME
-#
-#        # Change all uppercase to lowercase
-#        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-#
-#        docker tag $IMAGE_NAME $IMAGE_ID:${{steps.version.outputs.full}}
-#        docker push $IMAGE_ID:${{steps.version.outputs.full}}
-#
-#        docker tag $IMAGE_NAME $IMAGE_ID:latest
-#        docker push $IMAGE_ID:latest
-#
-#    - name: Create Release
-#      id: create_release
-#      uses: actions/create-release@v1
-#      env:
-#        GITHUB_TOKEN: ${{ github.token }}
-#      with:
-#        tag_name: ${{ github.ref }}
-#        release_name: Release ${{ github.ref }}
-#        body: |
-#          Generated Release ${{ github.ref }}
-#        draft: false
-#        prerelease: ${{ steps.version.outputs.isPrerelease }}
-#
+      - name: Create tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v5.5
+        with:
+          github_token: ${{ github.token }}
+          custom_tag: ${{ steps.version.outputs.full }}
+
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tag_name: v${{ steps.pkgVersion.outputs.full }}
+          name: Version ${{ steps.pkgVersion.outputs.full }}
+          body: |
+            Generated Release ${{ steps.pkgVersion.outputs.full }}
+          draft: false
+          prerelease: ${{ steps.version.outputs.isPrerelease || steps.version.outputs.major == 0 }}
