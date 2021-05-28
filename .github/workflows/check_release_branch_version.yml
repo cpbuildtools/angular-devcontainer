@@ -3,7 +3,7 @@ name: Check Release Version
 on:
   pull_request:
     branches:
-      - "release"
+      - "release/latest"
 
 jobs:
   version_check:
