@@ -1,0 +1,17 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - "*"
+      - "!master"
+      - "!release/v*"
+
+jobs:
+  check_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build . --file Dockerfile --tag "${{ github.event.repository.name }}"

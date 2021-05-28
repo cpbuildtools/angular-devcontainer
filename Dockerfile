@@ -47,6 +47,8 @@ RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod
 
 # Install node tooling 
 RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g yarn typescript ts-node @angular/cli" 2>&1
+RUN ng config -g cli.packageManager yarn
+
 
 # Bash history
 RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
