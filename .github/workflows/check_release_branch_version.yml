@@ -1,0 +1,38 @@
+name: Check Release Version
+
+on:
+  pull_request:
+    branches:
+      - "release"
+
+jobs:
+  version_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get package version
+        id: package_version_str
+        uses: martinbeentjes/npm-get-version-action@master
+
+      - name: Parse package version
+        id: pkgVersion
+        uses: doptools/action-parse-semver@main
+        with:
+          version: "${{ steps.package_version_str.outputs.current-version }}"
+          versionRegex: "(.*)"
+
+      - name: Get Previous tag
+        id: tag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
+      - name: Parse branch version
+        id: refVersion
+        uses: doptools/action-parse-semver@main
+        with:
+          version: "${{ steps.tag.outputs.tag }}"
+          versionRegex: "(.*)$"
+
+      - name: Error on major version mismatch
+        if: ${{ steps.refVersion.outputs.major > steps.pkgVersion.outputs.major }}
+        run: exit 1
