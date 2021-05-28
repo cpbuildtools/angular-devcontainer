@@ -39,13 +39,22 @@ jobs:
           version: "${{ steps.package_version_str.outputs.current-version }}"
           versionRegex: "(.*)"
 
+      - name: Build image
+        run: docker build . --file Dockerfile --tag ${{ github.event.repository.name }}
+
       - name: Create image id
         run: echo "IMAGE_ID=docker.pkg.github.com/${{github.repository}}/${{ github.event.repository.name }}" >> $GITHUB_ENV
 
-      - name: Echo image id
-        run: echo $IMAGE_ID
-    #  - name: Build image
-    #    run: docker build . --file Dockerfile --tag ${{ github.event.repository.name }}
+      - name: Tag with '${{steps.version.outputs.full}}'
+        run: echo docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.full}}
+
+      - name: Tag with 'latest'
+        if: ${{steps.version.outputs.isPrerelease != true && steps.version.outputs.major != 0}}
+        run: echo docker tag ${{ github.event.repository.name }} $IMAGE_ID:latest
+
+      - name: Tag with 'next'
+        if: ${{steps.version.outputs.isPrerelease == true || steps.version.outputs.major == 0}}
+        run: echo docker tag ${{ github.event.repository.name }} $IMAGE_ID:next
   #    - name: Log into registry
   #      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 #
