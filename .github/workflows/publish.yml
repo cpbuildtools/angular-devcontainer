@@ -39,19 +39,23 @@ jobs:
       - name: Create image id
         run: echo "IMAGE_ID=docker.pkg.github.com/${{github.repository}}/${{ github.event.repository.name }}" >> $GITHUB_ENV
 
-      - name: Add release tags for '${{steps.version.outputs.full}}'
+      - name: Add pre-release tags
+        if: ${{steps.version.outputs.major == 0 || steps.version.outputs.isPrerelease == true}}
+        run: |
+          docker tag ${{ github.event.repository.name }} $IMAGE_ID:next
+          docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.full}}
+
+      - name: Add pre-release type tag
+        if: ${{steps.version.outputs.isPrerelease == true}}
+        run: |
+          docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.major}}.${{steps.version.outputs.minor}}.${{steps.version.outputs.patch}}-${{steps.version.outputs.prerelease}}
+
+      - name: Add release tags
         if: ${{steps.version.outputs.isPrerelease != true && steps.version.outputs.major != 0}}
         run: |
           docker tag ${{ github.event.repository.name }} $IMAGE_ID:latest
           docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.full}}
           docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.major}}
-
-      - name: Add pre-release tags for '${{steps.version.outputs.full}}'
-        if: ${{steps.version.outputs.isPrerelease == true || steps.version.outputs.major == 0}}
-        run: |
-          docker tag ${{ github.event.repository.name }} $IMAGE_ID:next
-          docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.full}}
-          docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.major}}.${{steps.version.outputs.minor}}.${{steps.version.outputs.patch}}-${{steps.version.outputs.prerelease}}
 
       - name: Log into registry
         run: echo "${{ github.token }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
