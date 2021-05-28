@@ -5,7 +5,7 @@ on:
       - "release/v*"
 
 env:
-  IMAGE_NAME: ${{ github.event.repository.name }}
+  IMAGE_NAME:
 
 #  IMAGE_OWNER: cpbuildtools
 #  IMAGE_REPO: angular-devcontainer
@@ -39,10 +39,15 @@ jobs:
           version: "${{ steps.package_version_str.outputs.current-version }}"
           versionRegex: "(.*)"
 
-      - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+      - name: Tag image
+        run: |
+          IMAGE_ID=docker.pkg.github.com/${github.repository}/${{ github.event.repository.name }}
+          echo $IMAGE_ID
+    #  - name: Build image
+    #    run: docker build . --file Dockerfile --tag ${{ github.event.repository.name }}
   #    - name: Log into registry
   #      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+
 #
 #    - name: Push image
 #      run: |
