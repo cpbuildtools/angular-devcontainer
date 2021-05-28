@@ -42,6 +42,7 @@ jobs:
       - name: Add pre-release tags
         if: ${{steps.version.outputs.major == 0 || steps.version.outputs.isPrerelease == true}}
         run: |
+          docker tag ${{ github.event.repository.name }} $IMAGE_ID:latest
           docker tag ${{ github.event.repository.name }} $IMAGE_ID:next
           docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.full}}
 
@@ -63,6 +64,7 @@ jobs:
       - name: Push pre-release
         if: ${{steps.version.outputs.major == 0 || steps.version.outputs.isPrerelease == true}}
         run: |
+          docker push $IMAGE_ID:latest
           docker push $IMAGE_ID:next
           docker push $IMAGE_ID:${{steps.version.outputs.full}}
 
@@ -96,4 +98,4 @@ jobs:
           body: |
             Generated Release ${{ steps.version.outputs.full }}
           draft: false
-          prerelease: ${{ steps.version.outputs.isPrerelease || steps.version.outputs.major == 0 }}
+          prerelease: ${{ steps.version.outputs.isPrerelease }}
