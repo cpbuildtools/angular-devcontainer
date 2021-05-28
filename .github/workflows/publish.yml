@@ -40,7 +40,7 @@ jobs:
           versionRegex: "(.*)"
 
       - name: Create image id
-        run: IMAGE_ID=docker.pkg.github.com/${{github.repository}}/${{ github.event.repository.name }}
+        run: echo "IMAGE_ID=docker.pkg.github.com/${{github.repository}}/${{ github.event.repository.name }}" >> $GITHUB_ENV
 
       - name: Echo image id
         run: echo $IMAGE_ID
