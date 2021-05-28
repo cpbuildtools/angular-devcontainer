@@ -91,9 +91,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          tag_name: v${{ steps.pkgVersion.outputs.full }}
-          name: Version ${{ steps.pkgVersion.outputs.full }}
+          tag_name: v${{ steps.version.outputs.full }}
+          name: Version ${{ steps.version.outputs.full }}
           body: |
-            Generated Release ${{ steps.pkgVersion.outputs.full }}
+            Generated Release ${{ steps.version.outputs.full }}
           draft: false
           prerelease: ${{ steps.version.outputs.isPrerelease || steps.version.outputs.major == 0 }}
