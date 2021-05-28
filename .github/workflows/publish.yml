@@ -4,12 +4,6 @@ on:
     branches:
       - "release/v*"
 
-env:
-  IMAGE_NAME:
-
-#  IMAGE_OWNER: cpbuildtools
-#  IMAGE_REPO: angular-devcontainer
-
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -33,7 +27,7 @@ jobs:
         run: exit 1
 
       - name: Parse package version
-        id: pkgVersion
+        id: version
         uses: doptools/action-parse-semver@main
         with:
           version: "${{ steps.package_version_str.outputs.current-version }}"
@@ -55,8 +49,9 @@ jobs:
       - name: Tag with 'next'
         if: ${{steps.version.outputs.isPrerelease == true || steps.version.outputs.major == 0}}
         run: echo docker tag ${{ github.event.repository.name }} $IMAGE_ID:next
-  #    - name: Log into registry
-  #      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+
+      - name: Log into registry
+        run: echo "${{ github.token }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 #
 #    - name: Push image
 #      run: |
