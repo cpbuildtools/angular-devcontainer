@@ -59,6 +59,25 @@ jobs:
 
       - name: Log into registry
         run: echo "${{ github.token }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+
+      - name: Push pre-release
+        if: ${{steps.version.outputs.major == 0 || steps.version.outputs.isPrerelease == true}}
+        run: |
+          docker push $IMAGE_ID:next
+          docker push $IMAGE_ID:${{steps.version.outputs.full}}
+
+      - name: Push pre-release type
+        if: ${{steps.version.outputs.isPrerelease == true}}
+        run: |
+          docker push $IMAGE_ID:${{steps.version.outputs.major}}.${{steps.version.outputs.minor}}.${{steps.version.outputs.patch}}-${{steps.version.outputs.prerelease}}
+
+      - name: Push release
+        if: ${{steps.version.outputs.isPrerelease != true && steps.version.outputs.major != 0}}
+        run: |
+          docker push $IMAGE_ID:latest
+          docker push $IMAGE_ID:${{steps.version.outputs.full}}
+          docker push $IMAGE_ID:${{steps.version.outputs.major}}
+
 #
 #    - name: Push image
 #      run: |
