@@ -7,9 +7,6 @@ on:
       - "!master"
       - "!release/v*"
 
-env:
-  NODE_VERSION: 14.x
-
 jobs:
   check_build:
     runs-on: ubuntu-latest
