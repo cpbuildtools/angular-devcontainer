@@ -39,15 +39,15 @@ jobs:
           version: "${{ steps.package_version_str.outputs.current-version }}"
           versionRegex: "(.*)"
 
-      - name: Tag image
-        run: |
-          IMAGE_ID=docker.pkg.github.com/${{github.repository}}/${{ github.event.repository.name }}
-          echo $IMAGE_ID
+      - name: Create image id
+        run: IMAGE_ID=docker.pkg.github.com/${{github.repository}}/${{ github.event.repository.name }}
+
+      - name: Echo image id
+        run: echo $IMAGE_ID
     #  - name: Build image
     #    run: docker build . --file Dockerfile --tag ${{ github.event.repository.name }}
   #    - name: Log into registry
   #      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-
 #
 #    - name: Push image
 #      run: |
