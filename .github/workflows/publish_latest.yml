@@ -54,7 +54,7 @@ jobs:
           docker tag ${{ github.event.repository.name }} $IMAGE_ID:next
 
       - name: Add prerelease tag
-        if: steps.version.outputs.isPrerelease == true}}
+        if: ${{steps.version.outputs.isPrerelease == true}}
         run: |
           docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.major}}.${{steps.version.outputs.minor}}.${{steps.version.outputs.patch}}-${{steps.version.outputs.prerelease}}
 
@@ -76,7 +76,7 @@ jobs:
           docker push $IMAGE_ID:next
 
       - name: Push prerelease tag
-        if: steps.version.outputs.isPrerelease == true}}
+        if: ${{steps.version.outputs.isPrerelease == true}}
         run: |
           docker push $IMAGE_ID:${{steps.version.outputs.major}}.${{steps.version.outputs.minor}}.${{steps.version.outputs.patch}}-${{steps.version.outputs.prerelease}}
 
