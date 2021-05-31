@@ -39,45 +39,35 @@ jobs:
       - name: Create image id
         run: echo "IMAGE_ID=docker.pkg.github.com/${{github.repository}}/${{ github.event.repository.name }}" >> $GITHUB_ENV
 
-      - name: Add pre-release tags
-        if: ${{steps.version.outputs.major == 0 || steps.version.outputs.isPrerelease == true}}
+      - name: Add version tag
         run: |
-          docker tag ${{ github.event.repository.name }} $IMAGE_ID:latest
-          docker tag ${{ github.event.repository.name }} $IMAGE_ID:next
           docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.full}}
 
-      - name: Add pre-release type tag
+      - name: Add prerelease tag
         if: ${{steps.version.outputs.isPrerelease == true}}
         run: |
           docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.major}}.${{steps.version.outputs.minor}}.${{steps.version.outputs.patch}}-${{steps.version.outputs.prerelease}}
 
-      - name: Add release tags
-        if: ${{steps.version.outputs.isPrerelease != true && steps.version.outputs.major != 0}}
+      - name: Add major version tag
+        if: ${{steps.version.outputs.isPrerelease != true}}
         run: |
-          docker tag ${{ github.event.repository.name }} $IMAGE_ID:latest
-          docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.full}}
           docker tag ${{ github.event.repository.name }} $IMAGE_ID:${{steps.version.outputs.major}}
 
       - name: Log into registry
         run: echo "${{ github.token }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
-      - name: Push pre-release
-        if: ${{steps.version.outputs.major == 0 || steps.version.outputs.isPrerelease == true}}
+      - name: Push version tag
         run: |
-          docker push $IMAGE_ID:latest
-          docker push $IMAGE_ID:next
-          docker push $IMAGE_ID:${{steps.version.outputs.full}}
+          docker push  $IMAGE_ID:${{steps.version.outputs.full}}
 
-      - name: Push pre-release type
+      - name: Push prerelease tag
         if: ${{steps.version.outputs.isPrerelease == true}}
         run: |
-          docker push $IMAGE_ID:${{steps.version.outputs.major}}.${{steps.version.outputs.minor}}.${{steps.version.outputs.patch}}-${{steps.version.outputs.prerelease}}
+          docker push  $IMAGE_ID:${{steps.version.outputs.major}}.${{steps.version.outputs.minor}}.${{steps.version.outputs.patch}}-${{steps.version.outputs.prerelease}}
 
-      - name: Push release
-        if: ${{steps.version.outputs.isPrerelease != true && steps.version.outputs.major != 0}}
+      - name: Push major version tag
+        if: ${{steps.version.outputs.isPrerelease != true}}
         run: |
-          docker push $IMAGE_ID:latest
-          docker push $IMAGE_ID:${{steps.version.outputs.full}}
           docker push $IMAGE_ID:${{steps.version.outputs.major}}
 
       - name: Create tag
