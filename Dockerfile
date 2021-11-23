@@ -46,7 +46,7 @@ RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod
 
 
 # Install node tooling 
-RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g yarn typescript ts-node @angular/cli" 2>&1
+RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g yarn typescript ts-node @angular/cli cordova" 2>&1
 
 # Bash history
 RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
@@ -59,6 +59,26 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
 # Install Java
 RUN apt-get update \
   && apt-get install -y default-jdk 
+
+# Install Android SDK
+RUN apt-get update \
+  && apt-get install -y android-sdk
+
+# Install Android CLI Tools
+WORKDIR /home/vscode
+RUN wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -O android-tools.zip
+RUN unzip android-tools.zip
+RUN ls -al
+RUN rm android-tools.zip
+RUN mkdir -p /usr/lib/android-sdk/cmdline-tools/latest/
+RUN mv cmdline-tools/* /usr/lib/android-sdk/cmdline-tools/latest/
+
+ENV ANDROID_HOME "/usr/lib/android-sdk"
+ENV PATH "$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"
+ENV PATH "$PATH:$ANDROID_HOME/platform-tools"
+#ENV JAVA_OPTS "-XX:+IgnoreUnrecognizedVMOptions --add-modules java.se.ee"
+
+RUN sdkmanager "platform-tools" "platforms;android-31"
 
 # Install OpenApi generator
 RUN npm i -g @openapitools/openapi-generator-cli
