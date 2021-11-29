@@ -1,6 +1,6 @@
 {
   "name": "angular-devcontainer",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "main": "index.js",
   "repository": "https://github.com/cpbuildtools/angular-devcontainer.git",
   "author": "Dan Erdelt <erd@conceptual.ca>",
