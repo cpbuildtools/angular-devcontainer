@@ -60,27 +60,49 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
 
 # Install Java
 RUN apt-get update \
-  && apt-get install -y default-jdk 
+  && apt-get install -y openjdk-8-jdk 
+
+ENV JAVA_HOME "/usr/lib/jvm/java-8-openjdk-amd64"
+RUN update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+RUN update-alternatives --set javac /usr/lib/jvm/java-8-openjdk-amd64/bin/javac
 
 # Install Android SDK
 RUN apt-get update \
-  && apt-get install -y android-sdk
+  && apt-get install -y android-sdk usbutils python
+
 
 # Install Android CLI Tools
 WORKDIR /home/vscode
 RUN wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -O android-tools.zip
 RUN unzip android-tools.zip
-RUN ls -al
+
 RUN rm android-tools.zip
 RUN mkdir -p /usr/lib/android-sdk/cmdline-tools/latest/
 RUN mv cmdline-tools/* /usr/lib/android-sdk/cmdline-tools/latest/
 
 ENV ANDROID_HOME "/usr/lib/android-sdk"
+ENV ANDROID_SDK_ROOT "$ANDROID_HOME"
+
 ENV PATH "$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"
 ENV PATH "$PATH:$ANDROID_HOME/platform-tools"
-#ENV JAVA_OPTS "-XX:+IgnoreUnrecognizedVMOptions --add-modules java.se.ee"
+ENV PATH "$PATH:$ANDROID_HOME/tools/bin"
 
-RUN sdkmanager "platform-tools" "platforms;android-31"
+RUN yes | sdkmanager --licenses
+
+RUN /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager --update 
+RUN /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-30" "build-tools;30.0.2" "build-tools;30.0.3"
+RUN sdkmanager --uninstall "build-tools;debian"
+
+
+# install Chrome for testing
+RUN sudo apt-get update \
+    && sudo apt-get install libxss1 libappindicator1 libindicator7 -y \
+    && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && sudo apt install ./google-chrome*.deb -y  	
+
+RUN echo 'kernel.unprivileged_userns_clone=1' > /etc/sysctl.d/00-local-userns.conf
+
+
 
 # Install OpenApi generator
 RUN npm i -g @openapitools/openapi-generator-cli
