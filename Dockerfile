@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/vscode/devcontainers/dotnetcore:5.0
+FROM mcr.microsoft.com/vscode/devcontainers/dotnet:6.0-focal
 ARG NODE_VERSION="lts/*"
 # Configure apt
 ENV DEBIAN_FRONTEND=noninteractive
@@ -38,11 +38,11 @@ RUN echo "#!/bin/sh\n\
 # Install dotnet code formatter
 RUN dotnet tool install -g dotnet-format
 
-# Install dotnet 3.1
-RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
+# Install dotnet 3.1 & 5.0
+RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
   && dpkg -i packages-microsoft-prod.deb \
   && apt-get update \
-  && apt-get install -y dotnet-sdk-3.1
+  && apt-get install -y dotnet-sdk-3.1 dotnet-sdk-5.0
 
 
 # Install node tooling 
@@ -60,7 +60,7 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
 
 # Install Java
 RUN apt-get update \
-  && apt-get install -y openjdk-8-jdk 
+  && apt-get install -y openjdk-8-jdk openjdk-8-jre
 
 ENV JAVA_HOME "/usr/lib/jvm/java-8-openjdk-amd64"
 RUN update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
